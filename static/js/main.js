@@ -1,22 +1,49 @@
-// Three.js setup
+// Reusable materials and geometries
+const materials = {
+    wireframe: {
+        green: new THREE.LineBasicMaterial({ color: 0x00ff88, transparent: true, opacity: 1 }),
+        pink: new THREE.LineBasicMaterial({ color: 0xff0088, transparent: true, opacity: 1 }),
+        blue: new THREE.LineBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 1 }),
+        orange: new THREE.LineBasicMaterial({ color: 0xff8800, transparent: true, opacity: 1 })
+    },
+    glow: {
+        green: new THREE.MeshBasicMaterial({ color: 0x00ff88, transparent: true, opacity: 0.1, side: THREE.BackSide }),
+        pink: new THREE.MeshBasicMaterial({ color: 0xff0088, transparent: true, opacity: 0.1, side: THREE.BackSide }),
+        blue: new THREE.MeshBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 0.1, side: THREE.BackSide }),
+        orange: new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.1, side: THREE.BackSide })
+    },
+    fill: {
+        green: new THREE.MeshBasicMaterial({ color: 0x00ff88, transparent: true, opacity: 0.05 }),
+        pink: new THREE.MeshBasicMaterial({ color: 0xff0088, transparent: true, opacity: 0.05 }),
+        blue: new THREE.MeshBasicMaterial({ color: 0x0088ff, transparent: true, opacity: 0.05 }),
+        orange: new THREE.MeshBasicMaterial({ color: 0xff8800, transparent: true, opacity: 0.05 })
+    }
+};
+
+// Three.js setup with optimized settings
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
     canvas: document.querySelector('#bg'),
     antialias: true,
-    alpha: true
+    alpha: true,
+    powerPreference: 'high-performance'
 });
 
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for better performance
 renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.setZ(30);
 
-// Create stars
-function addStar() {
-    const geometry = new THREE.SphereGeometry(0.25, 24, 24);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
-    const star = new THREE.Mesh(geometry, material);
+// Optimized star creation with geometry instancing
+const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
+const starMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.5
+});
 
+function addStar() {
+    const star = new THREE.Mesh(starGeometry, starMaterial);
     const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(100));
     star.position.set(x, y, z);
     scene.add(star);
@@ -25,89 +52,99 @@ function addStar() {
 
 const stars = Array(200).fill().map(addStar);
 
-// Lighting
+// Optimized lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 const pointLight = new THREE.PointLight(0xffffff, 1);
 pointLight.position.set(5, 5, 5);
-scene.add(ambientLight, pointLight);
-
-// Add directional light for better visibility
 const dirLight = new THREE.DirectionalLight(0xffffff, 1);
 dirLight.position.set(0, 1, 0);
-scene.add(dirLight);
+scene.add(ambientLight, pointLight, dirLight);
 
-// Create geometric shapes for each section
+// Optimized shape creation functions
+function createShape(type, color, size = 3) {
+    let geometry, glowSize, fillSize;
+    
+    switch(type) {
+        case 'dodecahedron':
+            geometry = new THREE.DodecahedronGeometry(size);
+            glowSize = size * 1.067; // 3.2 / 3
+            fillSize = size * 0.967; // 2.9 / 3
+            break;
+        case 'octahedron':
+            geometry = new THREE.OctahedronGeometry(size);
+            glowSize = size * 1.05;
+            fillSize = size * 0.975;
+            break;
+        case 'torus':
+            geometry = new THREE.TorusGeometry(size, size/3, 32, 100);
+            glowSize = size * 1.067;
+            fillSize = size * 0.967;
+            break;
+        case 'icosahedron':
+            geometry = new THREE.IcosahedronGeometry(size);
+            glowSize = size * 1.067;
+            fillSize = size * 0.967;
+            break;
+    }
+
+    const edges = new THREE.EdgesGeometry(geometry);
+    const group = new THREE.Group();
+
+    // Main wireframe
+    const wireframe = new THREE.LineSegments(edges, materials.wireframe[color]);
+
+    // Glow effect
+    const glowGeometry = type === 'torus' 
+        ? new THREE.TorusGeometry(glowSize, (glowSize)/3, 32, 100)
+        : geometry.clone().scale(glowSize/size, glowSize/size, glowSize/size);
+    const glow = new THREE.Mesh(glowGeometry, materials.glow[color]);
+
+    // Inner fill
+    const fillGeometry = type === 'torus'
+        ? new THREE.TorusGeometry(fillSize, (fillSize)/3, 32, 100)
+        : geometry.clone().scale(fillSize/size, fillSize/size, fillSize/size);
+    const fill = new THREE.Mesh(fillGeometry, materials.fill[color]);
+
+    group.add(wireframe, glow, fill);
+    return group;
+}
+
+// Create geometric shapes with optimized creation
 const shapes = {
-    whoami: createDodecahedron(),
-    experience: createOctahedron(),
-    contact: createTorus(),
-    footer: createIcosahedron()
+    whoami: createShape('dodecahedron', 'green'),
+    experience: createShape('octahedron', 'pink', 4),
+    contact: createShape('torus', 'blue'),
+    footer: createShape('icosahedron', 'orange')
 };
 
-// Shape creation functions
-function createDodecahedron() {
-    const geometry = new THREE.DodecahedronGeometry(3);
-    const material = new THREE.MeshStandardMaterial({
-        color: 0x00ff88,
-        wireframe: true
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(-5, 0, 15);  
-    mesh.userData = {
-        homePosition: { x: -5, y: 0, z: 15 },
-        farPosition: { x: -5, y: 0, z: 50 }
-    };
-    scene.add(mesh);
-    return mesh;
-}
+// Position shapes
+shapes.whoami.position.set(-5, 0, 15);
+shapes.whoami.userData = {
+    homePosition: { x: -5, y: 0, z: 15 },
+    farPosition: { x: -5, y: 0, z: 50 }
+};
+scene.add(shapes.whoami);
 
-function createOctahedron() {
-    const geometry = new THREE.OctahedronGeometry(4);
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xff0088,
-        wireframe: true
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(5, 0, 15);  
-    mesh.userData = {
-        homePosition: { x: 5, y: 0, z: 15 },
-        farPosition: { x: 5, y: 0, z: 50 }
-    };
-    scene.add(mesh);
-    return mesh;
-}
+shapes.experience.position.set(5, 0, 15);
+shapes.experience.userData = {
+    homePosition: { x: 5, y: 0, z: 15 },
+    farPosition: { x: 5, y: 0, z: 50 }
+};
+scene.add(shapes.experience);
 
-function createTorus() {
-    const geometry = new THREE.TorusGeometry(3, 1, 16, 100);
-    const material = new THREE.MeshStandardMaterial({
-        color: 0x0088ff,
-        wireframe: true
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 0, 15);  
-    mesh.userData = {
-        homePosition: { x: 0, y: 0, z: 15 },
-        farPosition: { x: 0, y: 0, z: 50 }
-    };
-    scene.add(mesh);
-    return mesh;
-}
+shapes.contact.position.set(0, 0, 15);
+shapes.contact.userData = {
+    homePosition: { x: 0, y: 0, z: 15 },
+    farPosition: { x: 0, y: 0, z: 50 }
+};
+scene.add(shapes.contact);
 
-function createIcosahedron() {
-    const geometry = new THREE.IcosahedronGeometry(3);
-    const material = new THREE.MeshStandardMaterial({
-        color: 0xff8800,
-        wireframe: true
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(0, 0, 15);  
-    mesh.userData = {
-        homePosition: { x: 0, y: 0, z: 15 },
-        farPosition: { x: 0, y: 0, z: 50 }
-    };
-    scene.add(mesh);
-    return mesh;
-}
+shapes.footer.position.set(0, 0, 15);
+shapes.footer.userData = {
+    homePosition: { x: 0, y: 0, z: 15 },
+    farPosition: { x: 0, y: 0, z: 50 }
+};
+scene.add(shapes.footer);
 
 // Navigation dots and sections
 const navDots = document.querySelectorAll('.nav-dot');
@@ -152,9 +189,9 @@ function updateShapes(sectionIndex) {
         shape.scale.set(scale, scale, scale);
 
         // Adjust opacity based on distance
-        if (shape.material) {
-            shape.material.opacity = scale;
-            shape.material.transparent = true;
+        if (shape.children[0].material) {
+            shape.children[0].material.opacity = scale;
+            shape.children[0].material.transparent = true;
         }
     });
 }
@@ -238,9 +275,17 @@ function handleKeydown(e) {
     }
 }
 
-// Animation
-function animate() {
+// Optimized animation with requestAnimationFrame throttling
+let lastRender = 0;
+const FRAME_RATE = 60;
+const FRAME_INTERVAL = 1000 / FRAME_RATE;
+
+function animate(currentTime) {
     requestAnimationFrame(animate);
+
+    // Throttle rendering
+    if (currentTime - lastRender < FRAME_INTERVAL) return;
+    lastRender = currentTime;
 
     // Animate stars
     stars.forEach(star => {
@@ -261,25 +306,19 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// Handle window resize
-window.addEventListener('resize', () => {
-    // Update camera and renderer
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+animate();
 
-    // Adjust shape positions based on screen size
-    const isMobile = window.innerWidth < 768;
-    Object.values(shapes).forEach(shape => {
-        // Move shapes closer on mobile
-        if (isMobile) {
-            shape.userData.homePosition.z = 10;
-            shape.userData.farPosition.z = 30;
-        } else {
-            shape.userData.homePosition.z = 15;
-            shape.userData.farPosition.z = 50;
-        }
-    });
+// Optimized resize handler with debouncing
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    if (resizeTimeout) clearTimeout(resizeTimeout);
+    
+    resizeTimeout = setTimeout(() => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    }, 250);
 });
 
 // Add event listeners
@@ -317,9 +356,6 @@ window.addEventListener('load', () => {
         loadingScreen.style.display = 'none';
     }, 500);
 });
-
-// Start animation
-animate();
 
 // Set initial section positions
 sections.forEach((section, i) => {

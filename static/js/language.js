@@ -1,7 +1,13 @@
-// Language content
+// Cache DOM elements
+const languageButtons = document.querySelectorAll('.lang-btn');
+const whoamiText = document.getElementById('whoami-text');
+const experience = document.getElementById('experience');
+const contact = document.getElementById('contact');
+
+// Language content with memoization
 const languageContent = {
     en: {
-        whoami: `Hi, I'm Hachem, a 24-year-old software developer and manager from Nouadhibou, Mauritania. Passionate about technology since the age of 4, I thrive on challenges that push my limits.`,
+        whoami: `Hi, I'm Cheikh Hachem, a 24-year-old software developer and manager from Nouadhibou, Mauritania. Passionate about technology since the age of 4, I thrive on challenges that push my limits.`,
         experience: {
             title: "Experience",
             healthcare: {
@@ -19,7 +25,7 @@ const languageContent = {
         }
     },
     fr: {
-        whoami: `Je m'appelle Hachem, j'ai 24 ans et je suis originaire de Nouadhibou, en Mauritanie. Passionné par la technologie depuis l'âge de 4 ans, je vois chaque défi comme une occasion d'élargir mes compétences.`,
+        whoami: `Je m'appelle Cheikh Hachem, j'ai 24 ans et je suis originaire de Nouadhibou, en Mauritanie. Passionné par la technologie depuis l'âge de 4 ans, je vois chaque défi comme une occasion d'élargir mes compétences.`,
         experience: {
             title: "Expériences",
             healthcare: {
@@ -37,7 +43,7 @@ const languageContent = {
         }
     },
     ar: {
-        whoami: `اسمي هاشم، عمري 24 عامًا، من مواليد مدينة نواذيبو في موريتانيا. أحببت التكنولوجيا منذ سن الرابعة وأسعى دائمًا لاقتناص التحديات لتطوير مهاراتي.`,
+        whoami: `اسمي الشيخ هاشم، عمري 24 عامًا، من مواليد مدينة نواذيبو في موريتانيا. أحببت التكنولوجيا منذ سن الرابعة وأسعى دائمًا لاقتناص التحديات لتطوير مهاراتي.`,
         experience: {
             title: "الخبرات",
             healthcare: {
@@ -56,49 +62,49 @@ const languageContent = {
     }
 };
 
-// Current language
+// Current language state
 let currentLang = 'en';
 
-// Function to update content based on selected language
+// Update content function with performance optimization
 function updateContent(lang) {
-    // Update HTML dir attribute for RTL support
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    if (lang === currentLang) return; // Avoid unnecessary updates
     
-    // Update active button state
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
+    currentLang = lang;
+    const content = languageContent[lang];
+    
+    // Update text content efficiently
+    requestAnimationFrame(() => {
+        whoamiText.textContent = content.whoami;
+        
+        // Update experience section
+        experience.querySelector('h2').textContent = content.experience.title;
+        experience.querySelector('.card:nth-child(1) h3').textContent = content.experience.healthcare.title;
+        experience.querySelector('.card:nth-child(1) p').textContent = content.experience.healthcare.description;
+        experience.querySelector('.card:nth-child(2) h3').textContent = content.experience.developer.title;
+        experience.querySelector('.card:nth-child(2) p').textContent = content.experience.developer.description;
+        
+        // Update contact section
+        contact.querySelector('h2').textContent = content.contact.title;
+        contact.querySelector('.card > p').textContent = content.contact.message;
+        
+        // Update button states
+        languageButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        
+        // Update text direction for Arabic
+        document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
     });
-
-    // Update content
-    document.getElementById('whoami-text').textContent = languageContent[lang].whoami;
-    
-    // Update experience section
-    const exp = languageContent[lang].experience;
-    document.querySelector('#experience h2').textContent = exp.title;
-    document.querySelector('#experience .card:nth-child(1) h3').textContent = exp.healthcare.title;
-    document.querySelector('#experience .card:nth-child(1) p').textContent = exp.healthcare.description;
-    document.querySelector('#experience .card:nth-child(2) h3').textContent = exp.developer.title;
-    document.querySelector('#experience .card:nth-child(2) p').textContent = exp.developer.description;
-    
-    // Update contact section
-    const contact = languageContent[lang].contact;
-    document.querySelector('#contact h2').textContent = contact.title;
-    document.querySelector('#contact .card > p').textContent = contact.message;
 }
 
-// Initialize language switcher
-document.addEventListener('DOMContentLoaded', () => {
-    // Add click event listeners to language buttons
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const lang = btn.dataset.lang;
-            if (lang !== currentLang) {
-                currentLang = lang;
-                updateContent(lang);
-            }
-        });
-    });
-
-    // Initialize with English content
-    updateContent('en');
+// Event delegation for language buttons
+document.querySelector('.language-switcher').addEventListener('click', (e) => {
+    const btn = e.target.closest('.lang-btn');
+    if (btn) {
+        const lang = btn.dataset.lang;
+        updateContent(lang);
+    }
 });
+
+// Initialize with default language
+updateContent('en');
