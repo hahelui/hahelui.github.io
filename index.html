@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Experience...</div>
+    </div>
+
+    <canvas id="bg"></canvas>
+
+    <div class="content-wrapper">
+        <nav class="navigation">
+            <div class="nav-dots">
+                <div class="nav-dot active" data-section="whoami"></div>
+                <div class="nav-dot" data-section="experience"></div>
+                <div class="nav-dot" data-section="contact"></div>
+                <div class="nav-dot" data-section="footer"></div>
+            </div>
+        </nav>
+
+        <main>
+            <section id="whoami" class="section active">
+                <div class="section-content">
+                    <h1 class="glitch">$whoami</h1>
+                    <div class="card">
+                        <p>A passionate developer and healthcare professional bringing the best of both worlds together.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="experience" class="section">
+                <div class="section-content">
+                    <h2>Experience</h2>
+                    <div class="experience-container">
+                        <div class="card">
+                            <h3>Healthcare Professional</h3>
+                            <p>Working in a clinical setting, providing expert care and healing to patients.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Developer</h3>
+                            <p>Creating innovative solutions and bringing ideas to life through code.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="section">
+                <div class="section-content">
+                    <h2>Contact Me</h2>
+                    <div class="card">
+                        <p>Let's create something amazing together.</p>
+                        <div class="contact-links">
+                            <a href="mailto:your.email@example.com">✉️ Email</a>
+                            <a href="https://github.com/yourusername">🐱 GitHub</a>
+                            <a href="https://linkedin.com/in/yourprofile">💼 LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="footer" class="section">
+                <div class="section-content">
+                    <div class="card">
+                        <p>© 2025 Portfolio</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Three.js and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="static/js/main.js"></script>
+</body>
+</html>
