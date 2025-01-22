@@ -4,60 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Portfolio</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/fflate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading Experience...</div>
+    </div>
+
     <canvas id="bg"></canvas>
 
-    <nav class="navigation">
-        <div class="nav-dot active" data-section="whoami"></div>
-        <div class="nav-dot" data-section="experience"></div>
-        <div class="nav-dot" data-section="contact"></div>
-        <div class="nav-dot" data-section="footer"></div>
-    </nav>
-
-    <main>
-        <section id="whoami">
-            <h1 class="glitch">$whoami</h1>
-            <div class="card">
-                <p>A passionate developer and healthcare professional bringing the best of both worlds together.</p>
+    <div class="content-wrapper">
+        <nav class="navigation">
+            <div class="nav-dots">
+                <div class="nav-dot active" data-section="whoami"></div>
+                <div class="nav-dot" data-section="experience"></div>
+                <div class="nav-dot" data-section="contact"></div>
+                <div class="nav-dot" data-section="footer"></div>
             </div>
-        </section>
+        </nav>
 
-        <section id="experience">
-            <h2>Experience</h2>
-            <div class="experience-container">
-                <div class="card">
-                    <h3>Healthcare Professional</h3>
-                    <p>Working in a clinical setting, providing expert care and healing to patients.</p>
+        <main>
+            <section id="whoami" class="section active">
+                <div class="section-content">
+                    <div class="header-container">
+                        <h1 class="glitch">$whoami</h1>
+                        <div class="language-switcher">
+                            <button class="lang-btn active" data-lang="en">EN</button>
+                            <button class="lang-btn" data-lang="fr">FR</button>
+                            <button class="lang-btn" data-lang="ar">ع</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <p id="whoami-text">A passionate developer and healthcare professional bringing the best of both worlds together.</p>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>Developer</h3>
-                    <p>Creating innovative solutions and bringing ideas to life through code.</p>
+            </section>
+
+            <section id="experience" class="section">
+                <div class="section-content">
+                    <h2>Experience</h2>
+                    <div class="experience-container">
+                        <div class="card" id="healthcare-professional">
+                            <h3>Healthcare Professional</h3>
+                            <p>Working in a clinical setting, providing expert care and healing to patients.</p>
+                        </div>
+                        <div class="card" id="developer">
+                            <h3 class="glitch">Developer</h3>
+                            <p class="glitch">Creating innovative solutions and bringing ideas to life through code.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="contact">
-            <h2>Contact Me</h2>
-            <div class="card">
-                <p>Let's create something amazing together.</p>
-                <!-- Add your contact form or details here -->
-            </div>
-        </section>
+            <section id="contact" class="section">
+                <div class="section-content">
+                    <h2>Contact Me</h2>
+                    <div class="card">
+                        <p>Let's create something amazing together.</p>
+                        <div class="contact-links">
+                            <a href="mailto:hachem@hachem.pro">✉️ Email "hachem@hachem.pro"</a>
+                            <a href="https://github.com/hahelui">🐱 GitHub</a>
 
-        <footer id="footer">
-            <div class="card">
-                <p> 2025 Portfolio</p>
-            </div>
-        </footer>
-    </main>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}" type="module" defer></script>
+            <section id="footer" class="section">
+                <div class="section-content">
+                    <div class="card">
+                        <p> 2025 Portfolio</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Three.js and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="static/js/language.js"></script>
+    <script src="static/js/main.js"></script>
 </body>
 </html>

@@ -28,9 +28,16 @@
         <main>
             <section id="whoami" class="section active">
                 <div class="section-content">
-                    <h1 class="glitch">$whoami</h1>
+                    <div class="header-container">
+                        <h1 class="glitch">$whoami</h1>
+                        <div class="language-switcher">
+                            <button class="lang-btn active" data-lang="en">EN</button>
+                            <button class="lang-btn" data-lang="fr">FR</button>
+                            <button class="lang-btn" data-lang="ar">ع</button>
+                        </div>
+                    </div>
                     <div class="card">
-                        <p>A passionate developer and healthcare professional bringing the best of both worlds together.</p>
+                        <p id="whoami-text">A passionate developer and healthcare professional bringing the best of both worlds together.</p>
                     </div>
                 </div>
             </section>
@@ -39,11 +46,11 @@
                 <div class="section-content">
                     <h2>Experience</h2>
                     <div class="experience-container">
-                        <div class="card">
+                        <div class="card" id="healthcare-professional">
                             <h3>Healthcare Professional</h3>
                             <p>Working in a clinical setting, providing expert care and healing to patients.</p>
                         </div>
-                        <div class="card">
+                        <div class="card" id="developer">
                             <h3>Developer</h3>
                             <p>Creating innovative solutions and bringing ideas to life through code.</p>
                         </div>
@@ -68,7 +75,7 @@
             <section id="footer" class="section">
                 <div class="section-content">
                     <div class="card">
-                        <p>© 2025 Portfolio</p>
+                        <p> 2025 Portfolio</p>
                     </div>
                 </div>
             </section>
@@ -80,6 +87,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     
     <!-- Custom JavaScript -->
+    <script src="static/js/language.js"></script>
     <script src="static/js/main.js"></script>
 </body>
 </html>
